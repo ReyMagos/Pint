@@ -6,5 +6,5 @@ import {CategoryScale, Chart, Legend, LinearScale, LineController, LineElement, 
 
 Chart.register(LineController, CategoryScale, LinearScale, PointElement, LineElement, Legend, Tooltip)
 
-// TemplatesProvider.init()
+TemplatesProvider.init()
 render(<App />, document.getElementById("app") as HTMLElement)

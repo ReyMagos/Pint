@@ -1,7 +1,7 @@
-import templateJson from "./templates.json"
+// import templateJson from "./templates.json"
 
 export class TemplatesProvider {
-  static templateJson: any = templateJson
+  static templateJson: any = null
 
   static init() {
     fetch("/templates.json", {
@@ -22,11 +22,11 @@ export class TemplatesProvider {
   static setTemplate(id: number, newTemplate: any) {
     this.templateJson[id] = newTemplate
 
-    // fetch("/set_template", {
-    //   method: "POST",
-    //   headers: {"Content-Type": "application/json"},
-    //   body: JSON.stringify(newTemplate)
-    // }).then(response => console.log(response))
+    fetch("/set_template", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(newTemplate)
+    }).then(response => console.log(response))
   }
 }
 

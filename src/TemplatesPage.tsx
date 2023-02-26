@@ -90,7 +90,7 @@ const TemplateEdit = (props: { id: number }) => {
   }
 
   const removeStep = (id: number) => {
-    let newSteps = [];
+    let newSteps: any[] = [];
     for (const [i, step] of steps.entries()) {
       if (i != id)
         newSteps.push(step)
