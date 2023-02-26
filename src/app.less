@@ -73,6 +73,14 @@
       margin: 0.5rem;
     }
   }
+
+  & .name {
+    font-size: 1.5em;
+    font-weight: bold;
+
+    width: 15rem;
+    text-align: left;
+  }
 }
 
 .template .edit {
@@ -92,8 +100,6 @@
 
     box-shadow: 0 0 0 rgba(0, 0, 0, 0.121), 0 0 1px rgba(0, 0, 0, 0.179), 0 2px 5px rgba(0, 0, 0, 0.3);
     border-radius: 8px;
-    position: relative;
-    z-index: 2;
 
     & td {
       padding: 8px;
@@ -115,16 +121,14 @@
 }
 
 .edit tr td:last-child .red-button {
-  height: 41px;
+  height: 44px;
   box-shadow: none;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
 
 #add {
-  position: relative;
-  top: -0.8rem;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  z-index: 1;
+  width: 20%;
+  height: 1.5rem;
+  padding: 0;
 }

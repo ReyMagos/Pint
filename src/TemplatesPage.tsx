@@ -1,6 +1,7 @@
-import templatesJson from "./templates.json"
 import {useState} from "preact/hooks";
 import {TemplatesProvider} from "./TemplatesProvider";
+import {RouterContext} from "./app";
+import {ProcessPage} from "./ProcessPage";
 
 export const TemplatesPage = () => {
   return (
@@ -8,7 +9,7 @@ export const TemplatesPage = () => {
       <div class="control">
         <button>New</button>
       </div>
-      {templatesJson.map((template, i) => <Template id={i} />)}
+      {[...Array(TemplatesProvider.templateJson.length).keys()].map(i => <Template id={i} />)}
     </div>
   )
 }
@@ -19,11 +20,12 @@ const Template = (props: {id: number}) => {
   let controls;
   if (isEditing) {
     controls = (
-      <div class="right controls">
+      <div class="right control">
         <button class="green-button" onClick={() => {
 
           // TODO: type
-          let newTemplate: any = {name: "just name", steps: []}
+          let newTemplate: any = {name: (document.querySelector(`#name${props.id}`) as HTMLInputElement).value,
+            steps: []}
 
           const editTable = document.querySelector(`#edit${props.id} table tbody`)
           if (editTable !== null) {
@@ -49,7 +51,12 @@ const Template = (props: {id: number}) => {
   } else {
     controls = (
       <div class="right control">
-        <button>Run</button>
+        <RouterContext.Consumer>
+          {selectPage => <button onClick={() => {
+            // Run template
+            selectPage(<ProcessPage />)
+          }}>Run</button>}
+        </RouterContext.Consumer>
         <button onClick={() => toggleEdit(true)}>Edit</button>
         <button onClick={() => {
           // Delete template
@@ -64,8 +71,7 @@ const Template = (props: {id: number}) => {
     <div className="template">
       <div className="head">
         <div className="left">
-          {isEditing ? <input value={name} /> : <h2>{name}</h2>}
-          <p>Description</p>
+          {isEditing ? <input class="name" id={"name" + props.id} value={name} /> : <h2>{name}</h2>}
         </div>
         {controls}
       </div>

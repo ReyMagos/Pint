@@ -1,8 +1,11 @@
 import {StateUpdater, useState} from "preact/hooks"
 import "./app.less"
-import {Fragment} from "preact";
+import {createContext, Fragment} from "preact";
 import {ProcessPage} from "./ProcessPage";
 import {TemplatesPage} from "./TemplatesPage";
+
+
+export const RouterContext = createContext((value: any) => {})
 
 function Router(props: {onSelect: StateUpdater<any>}) {
   return (
@@ -10,6 +13,7 @@ function Router(props: {onSelect: StateUpdater<any>}) {
       <h1>Project Name</h1>
       <a onClick={() => props.onSelect(<ProcessPage />)}>Process</a>
       <a onClick={() => props.onSelect(<TemplatesPage />)}>Templates</a>
+      <a>Config</a>
     </div>
   )
 }
@@ -18,9 +22,11 @@ export function App() {
   const [page, setPage] = useState(<ProcessPage />);
 
   return (
-    <Fragment>
-      <Router onSelect={setPage} />
-      {page}
-    </Fragment>
+    <RouterContext.Provider value={setPage}>
+      <Fragment>
+        <Router onSelect={setPage} />
+        {page}
+      </Fragment>
+    </RouterContext.Provider>
   )
 }
