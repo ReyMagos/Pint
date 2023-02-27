@@ -19,14 +19,17 @@ export class TemplatesProvider {
 
   }
 
-  static setTemplate(id: number, newTemplate: any) {
+  static editTemplate(id: number, newTemplate: any) {
     this.templateJson[id] = newTemplate
 
-    fetch("/set_template", {
+    fetch("/edit_template?" + new URLSearchParams({ index: id.toString(), data: JSON.stringify(newTemplate) }), {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(newTemplate)
     }).then(response => console.log(response))
+  }
+
+  static deleteTemplate(id: number) {
+
   }
 }
 

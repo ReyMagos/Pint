@@ -2,17 +2,15 @@ import {useEffect, useState} from "preact/hooks";
 import {Chart} from "chart.js";
 import {TemplatesPage} from "./TemplatesPage";
 import {RouterContext} from "./app";
+import {ProcessController, ProcessState} from "./ProcessController";
 
-
-enum ProcessState {
-  EMPTY,
-  RUNNING,
-  STOPPING,
-  STOPPED
+function useForceUpdate() {
+  const [i, set] = useState(0)
+  return () => set(i => i + 1)
 }
 
 export const ProcessPage = () => {
-  const [processState, setProcessState] = useState(ProcessState.EMPTY)
+  const updatePage = useForceUpdate()
 
   // useEffect(() => {
   //   const ctx = document.querySelector("#process-page .graph") as HTMLCanvasElement
@@ -59,7 +57,7 @@ export const ProcessPage = () => {
   // })
 
   let control;
-  switch (processState) {
+  switch (ProcessController.currentState) {
     case ProcessState.EMPTY:
       control = (
         <div class="control">
@@ -70,16 +68,24 @@ export const ProcessPage = () => {
         </div>
       )
       break
+    case ProcessState.SET:
+      control = (
+        <div class="control">
+          <p>Template set</p>
+          <button onClick={() => {
+            ProcessController.runTemplate()
+            updatePage()
+          }}>Run</button>
+        </div>
+      )
+      break
     case ProcessState.RUNNING:
       control = (
         <div class="control">
           <p>Process running...</p>
           <button class="red-button" onClick={() => {
-            fetch("/stop_work", {
-              method: "POST"
-            }).then(() => setProcessState(ProcessState.STOPPED))
-
-            setProcessState(ProcessState.STOPPING)
+            ProcessController.stopTemplate({ onComplete: updatePage })
+            updatePage()
           }}>Stop</button>
         </div>
       )
@@ -97,7 +103,8 @@ export const ProcessPage = () => {
         <div class="control">
           <p>Process stopped</p>
           <button onClick={() => {
-            // Rerun
+            ProcessController.runTemplate()
+            updatePage()
           }}>Rerun</button>
         </div>
       )
@@ -105,6 +112,8 @@ export const ProcessPage = () => {
 
   return (
     <div id="process-page">
+      <h2>Template: {ProcessController.currentTemplate == -1 ? "Not set" :
+        ProcessController.currentTemplate}</h2>
       {control}
       {/*<canvas class="graph"></canvas>*/}
     </div>

@@ -2,6 +2,7 @@ import {useState} from "preact/hooks";
 import {TemplatesProvider} from "./TemplatesProvider";
 import {RouterContext} from "./app";
 import {ProcessPage} from "./ProcessPage";
+import {ProcessController} from "./ProcessController";
 
 export const TemplatesPage = () => {
   return (
@@ -40,7 +41,7 @@ const Template = (props: {id: number}) => {
               newTemplate.steps.push({temp: temp, time: time, header: header})
             }
 
-            TemplatesProvider.setTemplate(props.id, newTemplate)
+            TemplatesProvider.editTemplate(props.id, newTemplate)
           }
 
           toggleEdit(false)
@@ -53,7 +54,7 @@ const Template = (props: {id: number}) => {
       <div class="right control">
         <RouterContext.Consumer>
           {selectPage => <button onClick={() => {
-            // Run template
+            ProcessController.setTemplate(props.id)
             selectPage(<ProcessPage />)
           }}>Run</button>}
         </RouterContext.Consumer>
