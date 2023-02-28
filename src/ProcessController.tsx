@@ -30,7 +30,7 @@ export class ProcessController {
               .then(response => response.text())
               .then(history => {
                   for (let line of history.split("\n")) {
-                      const [time, step, temp] = line.split(" ").map(value => parseInt(value))
+                      const [time, step, temp] = line.split(" ").map(value => parseFloat(value))
                       this.chartData.push({ time: time, temp: temp })
                   }
               })
@@ -121,7 +121,7 @@ export class ProcessController {
             fetch("/get_temp", { method: "GET" })
               .then(response => response.text())
               .then(data => {
-                  const [time, temp] = data.split(" ").map(value => parseInt(value))
+                  const [time, temp] = data.split(" ").map(value => parseFloat(value))
                   ProcessController.chartData.push({ time: time, temp: temp })
                   ProcessController.updateChart()
               })
