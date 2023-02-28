@@ -2,15 +2,26 @@ import {useState} from "preact/hooks";
 import {TemplatesProvider} from "./TemplatesProvider";
 import {RouterContext} from "./app";
 import {ProcessPage} from "./ProcessPage";
-import {ProcessController} from "./ProcessController";
+import {ProcessController, ProcessState} from "./ProcessController";
 
 export const TemplatesPage = () => {
+  const isProcessLaunched = ProcessController.currentState == ProcessState.RUNNING
+
+  let templates;
+  if (TemplatesProvider.templateJson === null)
+    templates = <h2>Templates loading failed</h2>
+  else
+    templates = [
+      <div className="control">
+        <button disabled={isProcessLaunched}>New</button>
+      </div>,
+      ...[...Array(TemplatesProvider.templateJson.length).keys()].map(i => <Template id={i} />)
+    ]
+
   return (
     <div id="templates-page">
-      <div class="control">
-        <button>New</button>
-      </div>
-      {[...Array(TemplatesProvider.templateJson.length).keys()].map(i => <Template id={i} />)}
+      {isProcessLaunched ? <h2>Templates disabled while process is running</h2> : null}
+      {templates}
     </div>
   )
 }
@@ -50,16 +61,18 @@ const Template = (props: {id: number}) => {
       </div>
     )
   } else {
+    const isProcessLaunched = ProcessController.currentState == ProcessState.RUNNING
+
     controls = (
       <div class="right control">
         <RouterContext.Consumer>
-          {selectPage => <button onClick={() => {
+          {selectPage => <button disabled={isProcessLaunched} onClick={() => {
             ProcessController.setTemplate(props.id)
             selectPage(<ProcessPage />)
-          }}>Run</button>}
+          }}>Set</button>}
         </RouterContext.Consumer>
-        <button onClick={() => toggleEdit(true)}>Edit</button>
-        <button onClick={() => {
+        <button disabled={isProcessLaunched} onClick={() => toggleEdit(true)}>Edit</button>
+        <button disabled={isProcessLaunched} onClick={() => {
           // Delete template
         }} class="red-button">Delete</button>
       </div>

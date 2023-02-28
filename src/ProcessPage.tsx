@@ -1,8 +1,9 @@
 import {useEffect, useState} from "preact/hooks";
-import {Chart} from "chart.js";
 import {TemplatesPage} from "./TemplatesPage";
 import {RouterContext} from "./app";
 import {ProcessController, ProcessState} from "./ProcessController";
+import {TemplatesProvider} from "./TemplatesProvider";
+import {useRef} from "preact/compat";
 
 function useForceUpdate() {
   const [i, set] = useState(0)
@@ -11,50 +12,6 @@ function useForceUpdate() {
 
 export const ProcessPage = () => {
   const updatePage = useForceUpdate()
-
-  // useEffect(() => {
-  //   const ctx = document.querySelector("#process-page .graph") as HTMLCanvasElement
-  //
-  //   new Chart(ctx, {
-  //     type: "line",
-  //     data: {
-  //       labels: [1, 2, 3, 4, 5, 6],
-  //       datasets: [
-  //         {
-  //           label: "Real",
-  //           data: [13, 18, 3, 6, 1],
-  //           borderWidth: 2,
-  //           borderColor: "#e15858",
-  //           backgroundColor: "#e15858",
-  //           cubicInterpolationMode: "monotone"
-  //         },
-  //         {
-  //           label: "Template",
-  //           data: [12, 19, 3, 5, 2, 3],
-  //           borderWidth: 1,
-  //           borderColor: "#4ecc00",
-  //           backgroundColor: "#4ecc00",
-  //         }
-  //       ]
-  //     },
-  //     options: {
-  //       scales: {
-  //         x: {
-  //           title: {
-  //             display: true,
-  //             text: "Time"
-  //           }
-  //         },
-  //         y: {
-  //           title: {
-  //             display: true,
-  //             text: "Temp"
-  //           }
-  //         }
-  //       }
-  //     }
-  //   });
-  // })
 
   let control;
   switch (ProcessController.currentState) {
@@ -106,16 +63,34 @@ export const ProcessPage = () => {
             ProcessController.runTemplate()
             updatePage()
           }}>Rerun</button>
+          <button onClick={() => {
+            ProcessController.clearTemplate()
+            updatePage()
+          }}>Clear</button>
         </div>
       )
   }
 
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  useEffect(() => {
+    if (canvasRef.current !== null) {
+      const context = canvasRef.current.getContext("2d");
+      if (context !== null)
+        ProcessController.createChart(context)
+    }
+
+    return () => {
+      ProcessController.destroyChart()
+    }
+  }, [])
+
+  const currentTemplate = ProcessController.currentTemplate
+
   return (
     <div id="process-page">
-      <h2>Template: {ProcessController.currentTemplate == -1 ? "Not set" :
-        ProcessController.currentTemplate}</h2>
+      <h2>Template: {currentTemplate == -1 ? "Not set" : TemplatesProvider.getTemplate(currentTemplate).name}</h2>
       {control}
-      {/*<canvas class="graph"></canvas>*/}
+      <canvas ref={canvasRef} id="chart"></canvas>
     </div>
   )
 }
