@@ -37,7 +37,7 @@ export class ProcessController {
         }
 
         const loadCurrentWork = () => {
-            fetch("/now_template", {
+            fetch("/get_template_index", {
                 method: "GET",
                 headers: {"Accept": "text/plain"}
             })
@@ -123,8 +123,17 @@ export class ProcessController {
               .then(data => {
                   const [time, temp] = data.split(" ").map(value => parseInt(value))
                   ProcessController.chartData.push({ time: time, temp: temp })
+                  ProcessController.updateChart()
               })
         }, 30000)
+    }
+
+    static updateChart() {
+        if (this.chart !== null) {
+            this.chart.data.labels = this.chartData.map(entry => entry.time)
+            this.chart.data.datasets[0].data = this.chartData.map(entry => entry.temp)
+            this.chart.update("none")
+        }
     }
 
     static stopTemplate(callback: { onComplete: any }) {
