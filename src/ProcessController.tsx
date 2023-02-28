@@ -32,6 +32,7 @@ export class ProcessController {
                   for (let line of history.split("\n")) {
                       const [time, step, temp] = line.split(" ").map(value => parseFloat(value))
                       this.chartData.push({ time: time, temp: temp })
+                      this.updateChart()
                   }
               })
         }
@@ -74,7 +75,8 @@ export class ProcessController {
                         borderWidth: 2,
                         borderColor: "#e15858",
                         backgroundColor: "#e15858",
-                        cubicInterpolationMode: "monotone"
+                        cubicInterpolationMode: "monotone",
+                        pointStyle: false
                     }
                 ]
             },
