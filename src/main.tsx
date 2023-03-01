@@ -1,6 +1,6 @@
 import { render } from "preact"
 import { App } from "./app"
-import "./index.css"
+import "./index.less"
 import {TemplatesProvider} from "./TemplatesProvider";
 import {CategoryScale, Chart, Legend, LinearScale, LineController, LineElement, PointElement, Tooltip} from "chart.js";
 import {ProcessController} from "./ProcessController";
