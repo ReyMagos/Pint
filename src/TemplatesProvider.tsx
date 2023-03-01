@@ -1,7 +1,7 @@
-import templateJson from "./templates.json"
+// import templateJson from "./templates.json"
 
 export class TemplatesProvider {
-  static templateJson: any = templateJson
+  static templateJson: any = null
 
   static init() {
     fetch("/templates.json", {
@@ -15,8 +15,9 @@ export class TemplatesProvider {
     return this.templateJson[id]
   }
 
-  static addTemplate() {
-
+  static addTemplate(): number {
+    this.templateJson.push({ name: "Template", steps: [{ header: "Step", temp: 0, time: 0 }] })
+    return this.templateJson.length - 1
   }
 
   static editTemplate(id: number, newTemplate: any) {
@@ -29,7 +30,8 @@ export class TemplatesProvider {
   }
 
   static deleteTemplate(id: number) {
-
+    fetch("/delete_template" + new URLSearchParams({ index: id.toString() }))
+        .then(() => this.templateJson.splice(id, 1))
   }
 }
 

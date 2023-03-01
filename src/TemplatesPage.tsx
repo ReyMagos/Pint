@@ -3,31 +3,51 @@ import {TemplatesProvider} from "./TemplatesProvider";
 import {RouterContext} from "./app";
 import {ProcessPage} from "./ProcessPage";
 import {ProcessController, ProcessState} from "./ProcessController";
+import {JSX} from "preact";
 
 export const TemplatesPage = () => {
   const isProcessLaunched = ProcessController.currentState == ProcessState.RUNNING
+  const [updateState, setUpdate] = useState({ i: 0, template: -1 })
 
-  let templates;
+  let page;
   if (TemplatesProvider.templateJson === null)
-    templates = <h2>Templates loading failed</h2>
-  else
-    templates = [
+    page = <h2>Templates loading failed</h2>
+  else if (TemplatesProvider.templateJson.length === 0)
+    page = [
+      <h2>No templates exist</h2>,
       <div className="control">
-        <button disabled={isProcessLaunched}>New</button>
+        <button disabled={isProcessLaunched}
+                onClick={() => setUpdate({ i: updateState.i + 1, template: TemplatesProvider.addTemplate() })}>New
+        </button>
       </div>,
-      ...[...Array(TemplatesProvider.templateJson.length).keys()].map(i => <Template id={i} />)
+  ]
+  else {
+    const templates: JSX.Element[] = []
+    for (let id = 0; id < TemplatesProvider.templateJson.length; ++id) {
+      templates.push(<Template onDelete={() => setUpdate({ i: updateState.i + 1, template: -1 })}
+                               forceEdit={updateState.template === id} id={id} />)
+    }
+
+    page = [
+      <div className="control">
+        <button disabled={isProcessLaunched}
+                onClick={() => setUpdate({ i: updateState.i + 1, template: TemplatesProvider.addTemplate() })}>New
+        </button>
+      </div>,
+      ...templates
     ]
+  }
 
   return (
     <div id="templates-page">
       {isProcessLaunched ? <h2>Templates disabled while process is running</h2> : null}
-      {templates}
+      {page}
     </div>
   )
 }
 
-const Template = (props: {id: number}) => {
-  const [isEditing, toggleEdit] = useState(false)
+const Template = (props: {id: number, onDelete: () => void, forceEdit?: boolean}) => {
+  const [isEditing, toggleEdit] = useState(props.forceEdit == undefined ? false : props.forceEdit)
 
   let controls;
   if (isEditing) {
@@ -73,7 +93,8 @@ const Template = (props: {id: number}) => {
         </RouterContext.Consumer>
         <button disabled={isProcessLaunched} onClick={() => toggleEdit(true)}>Edit</button>
         <button disabled={isProcessLaunched} onClick={() => {
-          // Delete template
+          TemplatesProvider.deleteTemplate(props.id)
+          props.onDelete()
         }} class="red-button">Delete</button>
       </div>
     )
