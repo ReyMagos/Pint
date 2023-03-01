@@ -30,8 +30,8 @@ export class ProcessController {
               .then(response => response.text())
               .then(history => {
                   for (let line of history.split("\n")) {
-                      const [time, step, temp] = line.split(" ").map(value => parseFloat(value))
-                      this.chartData.push({ time: time, temp: temp })
+                      const data = line.split(" ")
+                      this.chartData.push({ time: parseInt(data[0]), temp: parseFloat(data[2]) })
                       this.updateChart()
                   }
               })
@@ -122,9 +122,9 @@ export class ProcessController {
         ProcessController.updateIntervalID = setInterval(() => {
             fetch("/get_temp", { method: "GET" })
               .then(response => response.text())
-              .then(data => {
-                  const [time, temp] = data.split(" ").map(value => parseFloat(value))
-                  ProcessController.chartData.push({ time: time, temp: temp })
+              .then(text => {
+                  const data = text.split(" ")
+                  ProcessController.chartData.push({ time: parseInt(data[0]), temp: parseFloat(data[2]) })
                   ProcessController.updateChart()
               })
         }, 30000)
