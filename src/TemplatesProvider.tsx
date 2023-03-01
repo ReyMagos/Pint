@@ -16,8 +16,12 @@ export class TemplatesProvider {
   }
 
   static addTemplate(): number {
-    this.templateJson.push({ name: "Template", steps: [{ header: "Step", temp: 0, time: 0 }] })
-    return this.templateJson.length - 1
+    fetch("/edit_template?" + new URLSearchParams({ index: this.templateJson.length.toString() }))
+      .then(() => {
+        this.templateJson.push({ name: "Template", steps: [{ header: "Step", temp: 0, time: 0 }] })
+        return this.templateJson.length - 1
+      })
+      return -1
   }
 
   static editTemplate(id: number, newTemplate: any) {
@@ -30,7 +34,7 @@ export class TemplatesProvider {
   }
 
   static deleteTemplate(id: number) {
-    fetch("/delete_template" + new URLSearchParams({ index: id.toString() }))
+    fetch("/delete_template?" + new URLSearchParams({ index: id.toString() }))
         .then(() => this.templateJson.splice(id, 1))
   }
 }
