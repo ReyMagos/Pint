@@ -13,6 +13,14 @@ function useForceUpdate() {
 export const ProcessPage = () => {
   const updatePage = useForceUpdate()
 
+  useEffect(() => {
+    ProcessController.onStateChanged = updatePage
+
+    return () => {
+      ProcessController.onStateChanged = null
+    }
+  }, [])
+
   let control;
   switch (ProcessController.currentState) {
     case ProcessState.EMPTY:
@@ -29,10 +37,7 @@ export const ProcessPage = () => {
       control = (
         <div class="control">
           <p>Template set</p>
-          <button onClick={() => {
-            ProcessController.runTemplate()
-            updatePage()
-          }}>Run</button>
+          <button onClick={() => ProcessController.runTemplate()}>Run</button>
         </div>
       )
       break
@@ -40,10 +45,7 @@ export const ProcessPage = () => {
       control = (
         <div class="control">
           <p>Process running...</p>
-          <button class="red-button" onClick={() => {
-            ProcessController.stopTemplate({ onComplete: updatePage })
-            updatePage()
-          }}>Stop</button>
+          <button class="red-button" onClick={() => ProcessController.stopTemplate({ onComplete: updatePage })}>Stop</button>
         </div>
       )
       break
@@ -59,14 +61,17 @@ export const ProcessPage = () => {
       control = (
         <div class="control">
           <p>Process stopped</p>
-          <button onClick={() => {
-            ProcessController.runTemplate()
-            updatePage()
-          }}>Rerun</button>
-          <button onClick={() => {
-            ProcessController.clearTemplate()
-            updatePage()
-          }}>Clear</button>
+          <button onClick={() => ProcessController.runTemplate()}>Rerun</button>
+          <button onClick={() => ProcessController.clearTemplate()}>Clear</button>
+        </div>
+      )
+      break
+    case ProcessState.FINISHED:
+      control = (
+        <div className="control">
+          <p>Process finished</p>
+          <button onClick={() => ProcessController.runTemplate()}>Rerun</button>
+          <button onClick={() => ProcessController.clearTemplate()}>Clear</button>
         </div>
       )
   }

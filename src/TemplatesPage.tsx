@@ -4,6 +4,7 @@ import {RouterContext} from "./app";
 import {ProcessPage} from "./ProcessPage";
 import {ProcessController, ProcessState} from "./ProcessController";
 import {JSX} from "preact";
+import {ChangeEvent} from "preact/compat";
 
 export const TemplatesPage = () => {
   const isProcessLaunched = ProcessController.currentState == ProcessState.RUNNING
@@ -124,8 +125,22 @@ const TemplateEdit = (props: { id: number }) => {
     setSteps([...steps, {temp: 0, time: 0, header: ""}])
   }
 
+  const editStep = (id: number, key: string, value: string) => {
+    let newSteps: any[] = []
+    for (const [i, step] of steps.entries()) {
+      if (i != id)
+        newSteps.push(step)
+      else {
+        let newStep = step
+        newStep[key] = value
+        newSteps.push(newStep)
+      }
+    }
+    setSteps(newSteps)
+  }
+
   const removeStep = (id: number) => {
-    let newSteps: any[] = [];
+    let newSteps: any[] = []
     for (const [i, step] of steps.entries()) {
       if (i != id)
         newSteps.push(step)
@@ -136,9 +151,9 @@ const TemplateEdit = (props: { id: number }) => {
   let tableRows = steps.map((step: any, i: number) => (
     <tr>
       <td>{i + 1}</td>
-      <td><input value={step.header} /></td>
-      <td><input value={step.temp} /></td>
-      <td><input value={step.time} /></td>
+      <td><input onInput={(event: ChangeEvent<HTMLInputElement>) => editStep(i, "header", (event.target as HTMLInputElement).value)} value={step.header} /></td>
+      <td><input onInput={(event: ChangeEvent<HTMLInputElement>) => editStep(i, "temp", (event.target as HTMLInputElement).value)} value={step.temp} /></td>
+      <td><input onInput={(event: ChangeEvent<HTMLInputElement>) => editStep(i, "time", (event.target as HTMLInputElement).value)} value={step.time} /></td>
       <td><button onClick={() => removeStep(i)} class="red-button">−</button></td>
     </tr>
   ))

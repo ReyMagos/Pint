@@ -5,7 +5,8 @@ export enum ProcessState {
     SET,
     RUNNING,
     STOPPING,
-    STOPPED
+    STOPPED,
+    FINISHED
 }
 
 type ChartEntry = {
@@ -16,10 +17,17 @@ type ChartEntry = {
 export class ProcessController {
     static currentTemplate: number = -1
     static currentState: ProcessState = ProcessState.EMPTY
+    static onStateChanged: any = null
 
     static chart: Chart | null = null
     static chartData: ChartEntry[] = []
     static updateIntervalID: number | null = null
+
+    static setState(state: ProcessState) {
+        this.currentState = state
+        if (this.onStateChanged !== null)
+            this.onStateChanged()
+    }
 
     static init() {
         const loadHistory = () => {
@@ -31,7 +39,7 @@ export class ProcessController {
               .then(history => {
                   for (let line of history.split("\n")) {
                       const data = line.split(" ")
-                      this.chartData.push({ time: parseInt(data[0]), temp: parseFloat(data[2]) })
+                      this.chartData.push({time: parseInt(data[0]), temp: parseFloat(data[2])})
                       this.updateChart()
                   }
               })
@@ -45,7 +53,7 @@ export class ProcessController {
               .then(response => response.text())
               .then(template => {
                   this.currentTemplate = parseInt(template)
-                  this.currentState = ProcessState.RUNNING
+                  this.setState(ProcessState.RUNNING)
 
                   loadHistory()
                   this.runUpdating()
@@ -106,13 +114,13 @@ export class ProcessController {
 
     static setTemplate(id: number) {
         this.currentTemplate = id;
-        this.currentState = ProcessState.SET
+        this.setState(ProcessState.SET)
 
         fetch("/set_template?" + new URLSearchParams({ index: id.toString() }), { method: "POST" }).then()
     }
 
     static runTemplate() {
-        this.currentState = ProcessState.RUNNING
+        this.setState(ProcessState.RUNNING)
 
         fetch("/start_work", { method: "POST" })
           .then(this.runUpdating)
@@ -120,13 +128,26 @@ export class ProcessController {
 
     static runUpdating() {
         ProcessController.updateIntervalID = setInterval(() => {
-            fetch("/get_temp", { method: "GET" })
-              .then(response => response.text())
-              .then(text => {
-                  const data = text.split(" ")
-                  ProcessController.chartData.push({ time: parseInt(data[0]), temp: parseFloat(data[2]) })
-                  ProcessController.updateChart()
-              })
+            let status;
+            fetch("/work_status", {
+                method: "GET",
+                headers: {"Accept": "text/plain"}
+            }).then(response => response.text())
+              .then(work_status => status = work_status == "true")
+
+            if (status) {
+                fetch("/get_temp", {method: "GET"})
+                  .then(response => response.text())
+                  .then(text => {
+                      const data = text.split(" ")
+                      ProcessController.chartData.push({time: parseInt(data[0]), temp: parseFloat(data[2])})
+                      ProcessController.updateChart()
+                  })
+            } else {
+                ProcessController.setState(ProcessState.FINISHED)
+                if (this.updateIntervalID !== null)
+                    clearInterval(this.updateIntervalID)
+            }
         }, 30000)
     }
 
@@ -139,21 +160,21 @@ export class ProcessController {
     }
 
     static stopTemplate(callback: { onComplete: any }) {
-        this.currentState = ProcessState.STOPPING
+        this.setState(ProcessState.STOPPING)
         if (this.updateIntervalID !== null)
             clearInterval(this.updateIntervalID)
 
         fetch("/stop_work", { method: "POST" })
             .then(response => (this.currentState = ProcessState.STOPPED))
           .finally(() => {
-              this.currentState = ProcessState.STOPPED
+              this.setState(ProcessState.STOPPED)
               callback.onComplete()
           })
     }
 
     static clearTemplate() {
         this.currentTemplate = -1
-        this.currentState = ProcessState.EMPTY
+        this.setState(ProcessState.EMPTY)
         this.chartData = []
     }
 }

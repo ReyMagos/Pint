@@ -1,7 +1,7 @@
-// import templateJson from "./templates.json"
+import templateJson from "./templates.json"
 
 export class TemplatesProvider {
-  static templateJson: any = null
+  static templateJson: any = templateJson
 
   static init() {
     fetch("/templates.json", {
