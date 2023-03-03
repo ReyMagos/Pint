@@ -156,32 +156,24 @@ export class ProcessController {
 
   static startUpdating() {
     ProcessController.updateIntervalID = setInterval(() => {
-      let status = false
-      fetch("/work_status", {method: "GET", headers: {"Accept": "text/plain"}})
+      fetch("/get_temp", {method: "GET", headers: {"Accept": "text/plain"}})
         .then(response => response.text())
-        .then(work_status => {
-          status = (work_status === "true")
-          // console.log(work_status, status)
-        })
-      // console.log(status)
+        .then(text => {
+          const data = text.split(" ")
 
-      if (status) {
-        fetch("/get_temp", {method: "GET", headers: {"Accept": "text/plain"}})
-          .then(response => response.text())
-          .then(text => {
-            const data = text.split(" ")
-            ProcessController.chartData.push({
-              time: parseInt(data[0]),
-              step: data[1],
-              temp: parseFloat(data[2])
-            })
-            ProcessController.updateChart()
+          if (data[1] == 'L') {
+            ProcessController.setState(ProcessState.FINISHED)
+            if (ProcessController.updateIntervalID !== null)
+              clearInterval(ProcessController.updateIntervalID)
+          }
+
+          ProcessController.chartData.push({
+            time: parseInt(data[0]),
+            step: data[1],
+            temp: parseFloat(data[2])
           })
-      } else {
-        ProcessController.setState(ProcessState.FINISHED)
-        if (ProcessController.updateIntervalID !== null)
-          clearInterval(ProcessController.updateIntervalID)
-      }
+          ProcessController.updateChart()
+        })
     }, Config.timeStep * 1000)
   }
 
