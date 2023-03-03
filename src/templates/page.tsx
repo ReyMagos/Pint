@@ -12,7 +12,7 @@ export const TemplatesPage = () => {
   let page;
   if (TemplatesProvider.templateJson === null)
     page = <h2>Templates loading failed</h2>
-  else if (TemplatesProvider.templateJson.length === 0)
+  else if (TemplatesProvider.templates().length === 0)
     page = [
       <h2>No templates exist</h2>,
       <div className="control">
@@ -23,7 +23,7 @@ export const TemplatesPage = () => {
   ]
   else {
     const templates: JSX.Element[] = []
-    for (let id = TemplatesProvider.templateJson.length - 1; id >= 0; --id) {
+    for (let id = TemplatesProvider.templates().length - 1; id >= 0; --id) {
       templates.push(<Template onDelete={() => setUpdate({ i: updateState.i + 1, template: -1 })}
                                forceEdit={updateState.template === id} id={id} />)
     }
@@ -77,7 +77,7 @@ const Template = (props: {id: number, onDelete: () => void, forceEdit: boolean})
               newTemplate.steps.push({
                 header: header,
                 temp: parseFloat(temp),
-                time: parseFloat(time)
+                time: parseInt(time)
               })
             }
 

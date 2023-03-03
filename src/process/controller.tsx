@@ -11,6 +11,7 @@ export enum ProcessState {
 
 type ChartEntry = {
   time: number
+  step: number
   temp: number
 }
 
@@ -36,7 +37,11 @@ export class ProcessController {
         .then(history => {
           for (let line of history.split("\n")) {
             const data = line.split(" ")
-            this.chartData.push({time: parseInt(data[0]), temp: parseFloat(data[2])})
+            this.chartData.push({
+              time: parseInt(data[0]),
+              step: parseInt(data[1]),
+              temp: parseFloat(data[2])
+            })
             this.updateChart()
           }
         })
@@ -50,7 +55,7 @@ export class ProcessController {
           this.setState(ProcessState.RUNNING)
 
           loadHistory()
-          this.runUpdating()
+          this.startUpdating()
         })
     }
 
@@ -63,6 +68,9 @@ export class ProcessController {
   }
 
   static createChart(context: CanvasRenderingContext2D) {
+
+
+    // fixme: new chart every page creation
     this.chart = new Chart(context, {
       type: "line",
       data: {
@@ -81,18 +89,8 @@ export class ProcessController {
       },
       options: {
         scales: {
-          x: {
-            title: {
-              display: true,
-              text: "Time"
-            }
-          },
-          y: {
-            title: {
-              display: true,
-              text: "Temp"
-            }
-          }
+          x: {title: {display: true, text: "Time"}},
+          y: {title: {display: true, text: "Temp"}}
         }
       }
     });
@@ -103,21 +101,31 @@ export class ProcessController {
     this.chart = null
   }
 
+  static updateChart() {
+    if (this.chart !== null) {
+      this.chart.data.labels = this.chartData.map(entry => entry.time)
+      this.chart.data.datasets[0].data = this.chartData.map(entry => entry.temp)
+      this.chart.update("none")
+    }
+  }
+
   static setTemplate(id: number) {
+    fetch("/set_template?" + new URLSearchParams({ index: id.toString() }), { method: "POST" })
+      .catch(error => console.log("Setting template error: ", error))
+
     this.currentTemplate = id
     this.setState(ProcessState.SET)
-
-    fetch("/set_template?" + new URLSearchParams({index: id.toString()}), {method: "POST"}).then()
   }
 
   static runTemplate() {
-    this.setState(ProcessState.RUNNING)
-
     fetch("/start_work", {method: "POST"})
-      .then(this.runUpdating)
+      .then(this.startUpdating)
+      .catch(error => console.log("Run template error: ", error))
+
+    this.setState(ProcessState.RUNNING)
   }
 
-  static runUpdating() {
+  static startUpdating() {
     ProcessController.updateIntervalID = setInterval(() => {
       let status;
       fetch("/work_status", {method: "GET", headers: {"Accept": "text/plain"}})
@@ -129,7 +137,11 @@ export class ProcessController {
           .then(response => response.text())
           .then(text => {
             const data = text.split(" ")
-            ProcessController.chartData.push({time: parseInt(data[0]), temp: parseFloat(data[2])})
+            ProcessController.chartData.push({
+              time: parseInt(data[0]),
+              step: parseInt(data[1]),
+              temp: parseFloat(data[2])
+            })
             ProcessController.updateChart()
           })
       } else {
@@ -138,14 +150,6 @@ export class ProcessController {
           clearInterval(this.updateIntervalID)
       }
     }, 30000)
-  }
-
-  static updateChart() {
-    if (this.chart !== null) {
-      this.chart.data.labels = this.chartData.map(entry => entry.time)
-      this.chart.data.datasets[0].data = this.chartData.map(entry => entry.temp)
-      this.chart.update("none")
-    }
   }
 
   static stopTemplate() {
