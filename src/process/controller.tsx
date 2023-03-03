@@ -1,4 +1,5 @@
 import {Chart} from "chart.js";
+import {TemplatesProvider} from "src/templates/provider";
 
 export enum ProcessState {
   EMPTY,
@@ -11,7 +12,7 @@ export enum ProcessState {
 
 type ChartEntry = {
   time: number
-  step: number
+  step: string
   temp: number
 }
 
@@ -39,7 +40,7 @@ export class ProcessController {
             const data = line.split(" ")
             this.chartData.push({
               time: parseInt(data[0]),
-              step: parseInt(data[1]),
+              step: data[1],
               temp: parseFloat(data[2])
             })
             this.updateChart()
@@ -68,24 +69,47 @@ export class ProcessController {
   }
 
   static createChart(context: CanvasRenderingContext2D) {
+    let currentStep = this.chartData[0].step
 
+    const datasets: any = [{
+      label: (currentStep === "H" ? "Heat" :
+        TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
+      data: [],
+      borderWidth: 2,
+      borderColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
+      backgroundColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
+      cubicInterpolationMode: "monotone",
+      pointRadius: 0
+    }]
+
+    for (const entry of this.chartData) {
+      datasets[-1].data?.push(entry.temp)
+
+      if (entry.step !== currentStep) {
+        currentStep = entry.step
+
+        const ds: Chart.ChartDataSets = {
+          label: (currentStep === "H" ? "Heat" :
+            TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
+          data: [],
+          borderWidth: 2,
+          borderColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
+          backgroundColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
+          cubicInterpolationMode: "monotone",
+          pointRadius: 0
+        }
+        datasets.push(ds)
+
+        datasets[-1].data.push(entry.temp)
+      }
+    }
 
     // fixme: new chart every page creation
     this.chart = new Chart(context, {
       type: "line",
       data: {
         labels: this.chartData.map(entry => entry.time),
-        datasets: [
-          {
-            label: "Real",
-            data: this.chartData.map(entry => entry.temp),
-            borderWidth: 2,
-            borderColor: "#e15858",
-            backgroundColor: "#e15858",
-            cubicInterpolationMode: "monotone",
-            pointStyle: false
-          }
-        ]
+        datasets: datasets
       },
       options: {
         scales: {
@@ -122,6 +146,7 @@ export class ProcessController {
       .then(this.startUpdating)
       .catch(error => console.log("Run template error: ", error))
 
+    console.log(this)
     this.setState(ProcessState.RUNNING)
     this.chartData = []
   }
@@ -140,7 +165,7 @@ export class ProcessController {
             const data = text.split(" ")
             ProcessController.chartData.push({
               time: parseInt(data[0]),
-              step: parseInt(data[1]),
+              step: data[1],
               temp: parseFloat(data[2])
             })
             ProcessController.updateChart()

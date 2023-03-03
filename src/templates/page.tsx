@@ -16,23 +16,21 @@ export const TemplatesPage = () => {
     page = [
       <h2>No templates exist</h2>,
       <div className="control">
-        <button disabled={isProcessLaunched}
-                onClick={() => setUpdate({ i: updateState.i + 1, template: TemplatesProvider.addTemplate() })}>New
-        </button>
-      </div>,
+        <button disabled={isProcessLaunched} onClick={() =>
+            setUpdate({ i: updateState.i + 1, template: TemplatesProvider.addTemplate() })}>New</button>
+      </div>
   ]
   else {
     const templates: JSX.Element[] = []
     for (let id = TemplatesProvider.templates().length - 1; id >= 0; --id) {
       templates.push(<Template onDelete={() => setUpdate({ i: updateState.i + 1, template: -1 })}
-                               forceEdit={updateState.template === id} id={id} />)
+                               fresh={updateState.template === id} id={id} />)
     }
 
     page = [
       <div className="control">
         <button disabled={isProcessLaunched} onClick={() =>
-            setUpdate({ i: updateState.i + 1, template: TemplatesProvider.addTemplate() })
-        }>New</button>
+            setUpdate({ i: updateState.i + 1, template: TemplatesProvider.addTemplate() })}>New</button>
       </div>,
       ...templates
     ]
@@ -52,8 +50,8 @@ function readInput(input: Element | null) {
   return ""
 }
 
-const Template = (props: {id: number, onDelete: () => void, forceEdit: boolean}) => {
-  const [isEditing, setEdit] = useState(props.forceEdit)
+const Template = (props: {id: number, onDelete: () => void, fresh: boolean}) => {
+  const [isEditing, setEdit] = useState(props.fresh)
 
   let controls
   if (isEditing) {
@@ -86,7 +84,14 @@ const Template = (props: {id: number, onDelete: () => void, forceEdit: boolean})
 
           setEdit(false)
         }}>Save</button>
-        <button class="red-button" onClick={() => setEdit(false)}>Cancel</button>
+        {props.fresh ?
+          <button class="red-button" onClick={() => {
+            setEdit(false)
+            TemplatesProvider.deleteTemplate(props.id, true)
+            props.onDelete()
+          }}>Discard</button> :
+          <button onClick={() => setEdit(false)}>Cancel</button>
+        }
       </div>
     )
   } else {

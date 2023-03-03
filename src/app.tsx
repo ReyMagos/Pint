@@ -3,6 +3,7 @@ import "./app.less"
 import {createContext, Fragment} from "preact";
 import {ProcessPage} from "./process/page";
 import {TemplatesPage} from "./templates/page";
+import {ConfigPage} from "src/config/page";
 
 
 export const RouterContext = createContext((value: any) => {})
@@ -13,7 +14,7 @@ function Router(props: {onSelect: StateUpdater<any>}) {
       <h1>Project Name</h1>
       <a onClick={() => props.onSelect(<ProcessPage />)}>Process</a>
       <a onClick={() => props.onSelect(<TemplatesPage />)}>Templates</a>
-      <a>Config</a>
+      <a onClick={() => props.onSelect(<ConfigPage />)}>Config</a>
     </div>
   )
 }

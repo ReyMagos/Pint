@@ -32,9 +32,6 @@ export class TemplatesProvider {
   }
 
   static addTemplate(): number {
-    fetch("/edit_template?" + new URLSearchParams({ index: this.templates().length.toString() }))
-      .catch(error => console.log("Adding request error: ", error))
-
     this.templates().push({ name: "Template", steps: [{ header: "Step", temp: 0, time: 0 }] })
     return this.templates().length - 1
   }
@@ -48,9 +45,11 @@ export class TemplatesProvider {
     this.templates()[id] = newTemplate
   }
 
-  static deleteTemplate(id: number) {
-    fetch("/delete_template?" + new URLSearchParams({index: id.toString()}))
+  static deleteTemplate(id: number, client?: boolean) {
+    if (client === undefined || !client) {
+      fetch("/delete_template?" + new URLSearchParams({index: id.toString()}))
         .catch(error => console.log("Delete request error: ", error))
+    }
 
     this.templates().splice(id, 1)
   }
