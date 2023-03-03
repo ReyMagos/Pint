@@ -1,5 +1,6 @@
 import {Chart} from "chart.js";
 import {TemplatesProvider} from "src/templates/provider";
+import {Config} from "src/config";
 
 export enum ProcessState {
   EMPTY,
@@ -177,7 +178,7 @@ export class ProcessController {
         if (this.updateIntervalID !== null)
           clearInterval(this.updateIntervalID)
       }
-    }, 30000)
+    }, Config.timeStep * 1000)
   }
 
   static stopTemplate() {

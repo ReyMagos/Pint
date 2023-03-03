@@ -3,7 +3,7 @@ import "./app.less"
 import {createContext, Fragment} from "preact";
 import {ProcessPage} from "./process/page";
 import {TemplatesPage} from "./templates/page";
-import {ConfigPage} from "src/config/page";
+import {ConfigPage} from "src/config";
 
 
 export const RouterContext = createContext((value: any) => {})
