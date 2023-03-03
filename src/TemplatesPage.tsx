@@ -4,7 +4,6 @@ import {RouterContext} from "./app";
 import {ProcessPage} from "./ProcessPage";
 import {ProcessController, ProcessState} from "./ProcessController";
 import {JSX} from "preact";
-import {ChangeEvent} from "preact/compat";
 
 export const TemplatesPage = () => {
   const isProcessLaunched = ProcessController.currentState == ProcessState.RUNNING
@@ -24,16 +23,16 @@ export const TemplatesPage = () => {
   ]
   else {
     const templates: JSX.Element[] = []
-    for (let id = 0; id < TemplatesProvider.templateJson.length; ++id) {
+    for (let id = TemplatesProvider.templateJson.length - 1; id >= 0; --id) {
       templates.push(<Template onDelete={() => setUpdate({ i: updateState.i + 1, template: -1 })}
                                forceEdit={updateState.template === id} id={id} />)
     }
 
     page = [
       <div className="control">
-        <button disabled={isProcessLaunched}
-                onClick={() => setUpdate({ i: updateState.i + 1, template: TemplatesProvider.addTemplate() })}>New
-        </button>
+        <button disabled={isProcessLaunched} onClick={() =>
+            setUpdate({ i: updateState.i + 1, template: TemplatesProvider.addTemplate() })
+        }>New</button>
       </div>,
       ...templates
     ]
@@ -47,10 +46,10 @@ export const TemplatesPage = () => {
   )
 }
 
-const Template = (props: {id: number, onDelete: () => void, forceEdit?: boolean}) => {
-  const [isEditing, toggleEdit] = useState(props.forceEdit == undefined ? false : props.forceEdit)
+const Template = (props: {id: number, onDelete: () => void, forceEdit: boolean}) => {
+  const [isEditing, setEdit] = useState(props.forceEdit)
 
-  let controls;
+  let controls
   if (isEditing) {
     controls = (
       <div class="right control">
@@ -76,9 +75,9 @@ const Template = (props: {id: number, onDelete: () => void, forceEdit?: boolean}
             TemplatesProvider.editTemplate(props.id, newTemplate)
           }
 
-          toggleEdit(false)
+          setEdit(false)
         }}>Save</button>
-        <button class="red-button" onClick={() => toggleEdit(false)}>Cancel</button>
+        <button class="red-button" onClick={() => setEdit(false)}>Cancel</button>
       </div>
     )
   } else {
@@ -92,7 +91,7 @@ const Template = (props: {id: number, onDelete: () => void, forceEdit?: boolean}
             selectPage(<ProcessPage />)
           }}>Set</button>}
         </RouterContext.Consumer>
-        <button disabled={isProcessLaunched} onClick={() => toggleEdit(true)}>Edit</button>
+        <button disabled={isProcessLaunched} onClick={() => setEdit(true)}>Edit</button>
         <button disabled={isProcessLaunched} onClick={() => {
           TemplatesProvider.deleteTemplate(props.id)
           props.onDelete()
@@ -151,10 +150,10 @@ const TemplateEdit = (props: { id: number }) => {
   let tableRows = steps.map((step: any, i: number) => (
     <tr>
       <td>{i + 1}</td>
-      <td><input onInput={(event: ChangeEvent<HTMLInputElement>) => editStep(i, "header", (event.target as HTMLInputElement).value)} value={step.header} /></td>
-      <td><input onInput={(event: ChangeEvent<HTMLInputElement>) => editStep(i, "temp", (event.target as HTMLInputElement).value)} value={step.temp} /></td>
-      <td><input onInput={(event: ChangeEvent<HTMLInputElement>) => editStep(i, "time", (event.target as HTMLInputElement).value)} value={step.time} /></td>
-      <td><button onClick={() => removeStep(i)} class="red-button">−</button></td>
+      <td><input onInput={event => editStep(i, "header", (event.target as HTMLInputElement).value)} value={step.header} /></td>
+      <td><input onInput={event => editStep(i, "temp", (event.target as HTMLInputElement).value)} value={step.temp} /></td>
+      <td><input onInput={event => editStep(i, "time", (event.target as HTMLInputElement).value)} value={step.time} /></td>
+      <td><button disabled={steps.length === 1} onClick={() => removeStep(i)} class="red-button">−</button></td>
     </tr>
   ))
 

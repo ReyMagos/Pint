@@ -12,19 +12,19 @@
   -webkit-text-size-adjust: 100%;
 }
 
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
-}
 
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
+  &:hover {
+    color: #535bf2;
+  }
 }
 
 input {
@@ -60,33 +60,33 @@ button {
   transition: all 0.25s ease, outline-width 0s, outline-color 0s;
 
   box-shadow: 0 0 0 rgba(0, 0, 0, 0.121), 0 0 1px rgba(0, 0, 0, 0.179), 0 2px 5px rgba(0, 0, 0, 0.3);
-}
 
-button:hover {
-  background: #646cff;
-  color: white;
-}
-
-button:active {
-  box-shadow: none;
-}
-
-button:focus, button:focus-visible {
-  outline: #646cff solid 2px;
-  outline-offset: -2px;
-
-  &.red-button {
-    outline: 2px solid #d25454;
+  &:hover {
+    background: #646cff;
+    color: white;
   }
 
-  &.green-button {
-    outline: 2px solid #84c46d;
+  &:active {
+    box-shadow: none;
   }
-}
 
-button:disabled, button[disabled], button:disabled:hover, button[disabled]:hover {
-  background-color: #f9f9f9;
-  color: rgba(16, 16, 16, 0.3);
-  cursor: auto;
-  box-shadow: none;
+  &:focus, &:focus-visible {
+    outline: #646cff solid 2px;
+    outline-offset: -2px;
+
+    &.red-button {
+      outline: 2px solid #d25454;
+    }
+
+    &.green-button {
+      outline: 2px solid #84c46d;
+    }
+  }
+
+  &:disabled, &[disable], &:disabled:hover, &[disabled]:hover {
+    background-color: #f9f9f9;
+    color: rgba(16, 16, 16, 0.3);
+    cursor: auto;
+    box-shadow: none;
+  }
 }

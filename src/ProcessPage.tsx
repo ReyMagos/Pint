@@ -1,9 +1,9 @@
-import {useEffect, useState} from "preact/hooks";
+import {useEffect, useState, useRef} from "preact/hooks";
 import {TemplatesPage} from "./TemplatesPage";
 import {RouterContext} from "./app";
 import {ProcessController, ProcessState} from "./ProcessController";
 import {TemplatesProvider} from "./TemplatesProvider";
-import {useRef} from "preact/compat";
+import {JSX} from "preact";
 
 function useForceUpdate() {
   const [i, set] = useState(0)
@@ -13,71 +13,53 @@ function useForceUpdate() {
 export const ProcessPage = () => {
   const updatePage = useForceUpdate()
 
-  useEffect(() => {
-    ProcessController.onStateChanged = updatePage
-
-    return () => {
-      ProcessController.onStateChanged = null
-    }
-  }, [])
-
-  let control;
+  let control: JSX.Element[]
   switch (ProcessController.currentState) {
     case ProcessState.EMPTY:
-      control = (
-        <div class="control">
-          <p>No processes launched</p>
-          <RouterContext.Consumer>
-            {selectPage => <button onClick={() => selectPage(<TemplatesPage />)}>Go to templates</button>}
-          </RouterContext.Consumer>
-        </div>
-      )
+      control = [
+        <p>No processes launched</p>,
+        <RouterContext.Consumer>
+          {selectPage => <button onClick={() => selectPage(<TemplatesPage />)}>Go to templates</button>}
+        </RouterContext.Consumer>
+      ]
       break
     case ProcessState.SET:
-      control = (
-        <div class="control">
-          <p>Template set</p>
-          <button onClick={() => ProcessController.runTemplate()}>Run</button>
-        </div>
-      )
+      control = [
+        <p>Template set</p>,
+        <button onClick={ProcessController.runTemplate}>Run</button>
+      ]
       break
     case ProcessState.RUNNING:
-      control = (
-        <div class="control">
-          <p>Process running...</p>
-          <button class="red-button" onClick={() => ProcessController.stopTemplate({ onComplete: updatePage })}>Stop</button>
-        </div>
-      )
+      control = [
+        <p>Process running...</p>,
+        <button className="red-button" onClick={ProcessController.stopTemplate}>Stop</button>
+      ]
       break
     case ProcessState.STOPPING:
-      control = (
-        <div class="control">
-          <p>Stopping process...</p>
-          <button disabled>Stop</button>
-        </div>
-      )
+      control = [
+        <p>Stopping process...</p>,
+        <button disabled>Stop</button>
+      ]
       break
     case ProcessState.STOPPED:
-      control = (
-        <div class="control">
-          <p>Process stopped</p>
-          <button onClick={() => ProcessController.runTemplate()}>Rerun</button>
-          <button onClick={() => ProcessController.clearTemplate()}>Clear</button>
-        </div>
-      )
+      control = [
+        <p>Process stopped</p>,
+        <button onClick={ProcessController.runTemplate}>Rerun</button>,
+        <button onClick={ProcessController.clearTemplate}>Clear</button>
+      ]
       break
     case ProcessState.FINISHED:
-      control = (
-        <div className="control">
-          <p>Process finished</p>
-          <button onClick={() => ProcessController.runTemplate()}>Rerun</button>
-          <button onClick={() => ProcessController.clearTemplate()}>Clear</button>
-        </div>
-      )
+      control = [
+        <p>Process finished</p>,
+        <button onClick={ProcessController.runTemplate}>Rerun</button>,
+        <button onClick={ProcessController.clearTemplate}>Clear</button>
+      ]
   }
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
+    ProcessController.onStateChanged = updatePage
+
     if (canvasRef.current !== null) {
       const context = canvasRef.current.getContext("2d");
       if (context !== null)
@@ -85,6 +67,7 @@ export const ProcessPage = () => {
     }
 
     return () => {
+      ProcessController.onStateChanged = null
       ProcessController.destroyChart()
     }
   }, [])
@@ -94,7 +77,9 @@ export const ProcessPage = () => {
   return (
     <div id="process-page">
       <h2>Template: {currentTemplate == -1 ? "Not set" : TemplatesProvider.getTemplate(currentTemplate).name}</h2>
-      {control}
+      <div class="control">
+        {control}
+      </div>
       <canvas ref={canvasRef} id="chart"></canvas>
     </div>
   )
