@@ -159,7 +159,7 @@ export class ProcessController {
       let status
       fetch("/work_status", {method: "GET", headers: {"Accept": "text/plain"}})
         .then(response => response.text())
-        .then(work_status => status = work_status == "true")
+        .then(work_status => status = work_status === "true")
 
       if (status) {
         fetch("/get_temp", {method: "GET", headers: {"Accept": "text/plain"}})
