@@ -156,13 +156,14 @@ export class ProcessController {
 
   static startUpdating() {
     ProcessController.updateIntervalID = setInterval(() => {
-      let status
+      let status = false
       fetch("/work_status", {method: "GET", headers: {"Accept": "text/plain"}})
         .then(response => response.text())
         .then(work_status => {
           status = (work_status === "true")
-          console.log(work_status, status)
+          // console.log(work_status, status)
         })
+      // console.log(status)
 
       if (status) {
         fetch("/get_temp", {method: "GET", headers: {"Accept": "text/plain"}})
@@ -178,8 +179,8 @@ export class ProcessController {
           })
       } else {
         ProcessController.setState(ProcessState.FINISHED)
-        if (this.updateIntervalID !== null)
-          clearInterval(this.updateIntervalID)
+        if (ProcessController.updateIntervalID !== null)
+          clearInterval(ProcessController.updateIntervalID)
       }
     }, Config.timeStep * 1000)
   }
