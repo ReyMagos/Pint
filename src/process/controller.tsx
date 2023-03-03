@@ -22,7 +22,7 @@ export class ProcessController {
 
   static chart: Chart | null = null
   static chartData: ChartEntry[] = []
-  static updateIntervalID: NodeJS.Timer | null = null
+  static updateIntervalID: ReturnType<typeof setInterval> | null = null
 
   static setState(state: ProcessState) {
     this.currentState = state
@@ -123,11 +123,12 @@ export class ProcessController {
       .catch(error => console.log("Run template error: ", error))
 
     this.setState(ProcessState.RUNNING)
+    this.chartData = []
   }
 
   static startUpdating() {
     ProcessController.updateIntervalID = setInterval(() => {
-      let status;
+      let status
       fetch("/work_status", {method: "GET", headers: {"Accept": "text/plain"}})
         .then(response => response.text())
         .then(work_status => status = work_status == "true")

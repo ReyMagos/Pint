@@ -57,6 +57,7 @@ export const ProcessPage = () => {
   }
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
+
   useEffect(() => {
     ProcessController.onStateChanged = updatePage
 
