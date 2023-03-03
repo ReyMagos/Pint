@@ -69,38 +69,40 @@ export class ProcessController {
   }
 
   static createChart(context: CanvasRenderingContext2D) {
-    let currentStep = this.chartData[0].step
+    const datasets: any = []
 
-    const datasets: any = [{
-      label: (currentStep === "H" ? "Heat" :
-        TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
-      data: [],
-      borderWidth: 2,
-      borderColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
-      backgroundColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
-      cubicInterpolationMode: "monotone",
-      pointRadius: 0
-    }]
+    if (this.chartData.length > 0) {
+      let currentStep = this.chartData[0].step
 
-    for (const entry of this.chartData) {
-      datasets[-1].data?.push(entry.temp)
+      datasets.push({
+        label: (currentStep === "H" ? "Heat" :
+          TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
+        data: [],
+        borderWidth: 2,
+        borderColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
+        backgroundColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
+        cubicInterpolationMode: "monotone",
+        pointRadius: 0
+      })
 
-      if (entry.step !== currentStep) {
-        currentStep = entry.step
+      for (const entry of this.chartData) {
+        datasets[-1].data?.push(entry.temp)
 
-        const ds: Chart.ChartDataSets = {
-          label: (currentStep === "H" ? "Heat" :
-            TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
-          data: [],
-          borderWidth: 2,
-          borderColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
-          backgroundColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
-          cubicInterpolationMode: "monotone",
-          pointRadius: 0
+        if (entry.step !== currentStep) {
+          currentStep = entry.step
+
+          const ds: Chart.ChartDataSets = {
+            label: (currentStep === "H" ? "Heat" :
+              TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
+            data: [entry.temp],
+            borderWidth: 2,
+            borderColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
+            backgroundColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
+            cubicInterpolationMode: "monotone",
+            pointRadius: 0
+          }
+          datasets.push(ds)
         }
-        datasets.push(ds)
-
-        datasets[-1].data.push(entry.temp)
       }
     }
 
@@ -108,7 +110,7 @@ export class ProcessController {
     this.chart = new Chart(context, {
       type: "line",
       data: {
-        labels: this.chartData.map(entry => entry.time),
+        labels: this.chartData.map(entry => entry.time / 60),
         datasets: datasets
       },
       options: {
