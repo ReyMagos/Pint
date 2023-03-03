@@ -26,13 +26,13 @@ export const ProcessPage = () => {
     case ProcessState.SET:
       control = [
         <p>Template set</p>,
-        <button onClick={ProcessController.runTemplate}>Run</button>
+        <button onClick={() => ProcessController.runTemplate()}>Run</button>
       ]
       break
     case ProcessState.RUNNING:
       control = [
         <p>Process running...</p>,
-        <button className="red-button" onClick={ProcessController.stopTemplate}>Stop</button>
+        <button className="red-button" onClick={() => ProcessController.stopTemplate()}>Stop</button>
       ]
       break
     case ProcessState.STOPPING:
@@ -44,15 +44,15 @@ export const ProcessPage = () => {
     case ProcessState.STOPPED:
       control = [
         <p>Process stopped</p>,
-        <button onClick={ProcessController.runTemplate}>Rerun</button>,
-        <button onClick={ProcessController.clearTemplate}>Clear</button>
+        <button onClick={() => ProcessController.runTemplate()}>Rerun</button>,
+        <button onClick={() => ProcessController.clearTemplate()}>Clear</button>
       ]
       break
     case ProcessState.FINISHED:
       control = [
         <p>Process finished</p>,
-        <button onClick={ProcessController.runTemplate}>Rerun</button>,
-        <button onClick={ProcessController.clearTemplate}>Clear</button>
+        <button onClick={() => ProcessController.runTemplate()}>Rerun</button>,
+        <button onClick={() => ProcessController.clearTemplate()}>Clear</button>
       ]
   }
 
