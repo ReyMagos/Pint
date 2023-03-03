@@ -21,7 +21,7 @@ export class ProcessController {
 
   static chart: Chart | null = null
   static chartData: ChartEntry[] = []
-  static updateIntervalID: number | null = null
+  static updateIntervalID: NodeJS.Timer | null = null
 
   static setState(state: ProcessState) {
     this.currentState = state
@@ -154,7 +154,7 @@ export class ProcessController {
       clearInterval(this.updateIntervalID)
 
     fetch("/stop_work", {method: "POST"})
-      .then(response => (this.currentState = ProcessState.STOPPED))
+      .then(() => (this.currentState = ProcessState.STOPPED))
       .finally(() => this.setState(ProcessState.STOPPED))
   }
 

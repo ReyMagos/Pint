@@ -1,8 +1,8 @@
 import {useState} from "preact/hooks";
-import {TemplatesProvider} from "./TemplatesProvider";
-import {RouterContext} from "./app";
-import {ProcessPage} from "./ProcessPage";
-import {ProcessController, ProcessState} from "./ProcessController";
+import {TemplateData, TemplatesProvider} from "./provider";
+import {RouterContext} from "../app";
+import {ProcessPage} from "src/process/page";
+import {ProcessController, ProcessState} from "src/process/controller";
 import {JSX} from "preact";
 
 export const TemplatesPage = () => {
@@ -46,6 +46,12 @@ export const TemplatesPage = () => {
   )
 }
 
+function readInput(input: Element | null) {
+  if (input !== null && input instanceof HTMLInputElement)
+    return input.value
+  return ""
+}
+
 const Template = (props: {id: number, onDelete: () => void, forceEdit: boolean}) => {
   const [isEditing, setEdit] = useState(props.forceEdit)
 
@@ -54,22 +60,25 @@ const Template = (props: {id: number, onDelete: () => void, forceEdit: boolean})
     controls = (
       <div class="right control">
         <button class="green-button" onClick={() => {
-
-          // TODO: type
-          let newTemplate: any = {name: (document.querySelector(`#name${props.id}`) as HTMLInputElement).value,
-            steps: []}
+          let newTemplate: TemplateData = {
+            name: readInput(document.querySelector(`#name${props.id}`)!),
+            steps: []
+          }
 
           const editTable = document.querySelector(`#edit${props.id} table tbody`)
           if (editTable !== null) {
             const steps = editTable.children
             for (let i = 1; i < steps.length; ++i) {
 
-              // TODO: clean this shit
-              const header = (steps[i].children[1].children[0] as HTMLInputElement).value,
-                    temp = (steps[i].children[2].children[0] as HTMLInputElement).value,
-                    time = (steps[i].children[3].children[0] as HTMLInputElement).value
+              const header = readInput(steps[i].children[1].children[0]),
+                    temp = readInput(steps[i].children[2].children[0]),
+                    time = readInput(steps[i].children[3].children[0])
 
-              newTemplate.steps.push({temp: temp, time: time, header: header})
+              newTemplate.steps.push({
+                header: header,
+                temp: parseFloat(temp),
+                time: parseFloat(time)
+              })
             }
 
             TemplatesProvider.editTemplate(props.id, newTemplate)
@@ -121,30 +130,19 @@ const TemplateEdit = (props: { id: number }) => {
   const [steps, setSteps] = useState(TemplatesProvider.getTemplate(props.id).steps)
 
   const addStep = () => {
-    setSteps([...steps, {temp: 0, time: 0, header: ""}])
+    setSteps([...steps, {header: "Step", temp: 0, time: 0}])
   }
 
   const editStep = (id: number, key: string, value: string) => {
-    let newSteps: any[] = []
-    for (const [i, step] of steps.entries()) {
-      if (i != id)
-        newSteps.push(step)
-      else {
-        let newStep = step
-        newStep[key] = value
-        newSteps.push(newStep)
-      }
-    }
-    setSteps(newSteps)
+    const stepsCopy = [...steps]
+    stepsCopy[id][key] = value
+    setSteps(stepsCopy)
   }
 
   const removeStep = (id: number) => {
-    let newSteps: any[] = []
-    for (const [i, step] of steps.entries()) {
-      if (i != id)
-        newSteps.push(step)
-    }
-    setSteps(newSteps)
+    const stepsCopy = [...steps]
+    stepsCopy.splice(id, 1)
+    setSteps(stepsCopy)
   }
 
   let tableRows = steps.map((step: any, i: number) => (

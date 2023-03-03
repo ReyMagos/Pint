@@ -1,8 +1,8 @@
 import {useEffect, useState, useRef} from "preact/hooks";
-import {TemplatesPage} from "./TemplatesPage";
-import {RouterContext} from "./app";
-import {ProcessController, ProcessState} from "./ProcessController";
-import {TemplatesProvider} from "./TemplatesProvider";
+import {TemplatesPage} from "src/templates/page";
+import {RouterContext} from "src/app";
+import {ProcessController, ProcessState} from "./controller";
+import {TemplatesProvider} from "src/templates/provider";
 import {JSX} from "preact";
 
 function useForceUpdate() {

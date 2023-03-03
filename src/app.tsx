@@ -1,9 +1,8 @@
 import {StateUpdater, useState} from "preact/hooks"
 import "./app.less"
 import {createContext, Fragment} from "preact";
-import {ProcessPage} from "./ProcessPage";
-import {TemplatesPage} from "./TemplatesPage";
-import {ProcessController} from "./ProcessController";
+import {ProcessPage} from "./process/page";
+import {TemplatesPage} from "./templates/page";
 
 
 export const RouterContext = createContext((value: any) => {})
