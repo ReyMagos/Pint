@@ -126,6 +126,8 @@ export class ProcessController {
             this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header,
             this.COLORS[datasets.length % 9])
           )
+
+          datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
         }
       }
     }
@@ -173,6 +175,8 @@ export class ProcessController {
               this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header,
               this.COLORS[datasets.length % 9])
             )
+
+            datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
           }
         }
       }
