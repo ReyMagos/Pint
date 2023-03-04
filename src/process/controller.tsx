@@ -44,8 +44,8 @@ export class ProcessController {
               step: data[1],
               temp: parseFloat(data[2])
             })
-            this.updateChart()
           }
+          this.updateChart()
         })
     }
 
@@ -130,8 +130,44 @@ export class ProcessController {
 
   static updateChart() {
     if (this.chart !== null) {
-      this.chart.data.labels = this.chartData.map(entry => entry.time)
-      this.chart.data.datasets[0].data = this.chartData.map(entry => entry.temp)
+      const datasets: any = []
+
+      if (this.chartData.length > 0) {
+        let currentStep = this.chartData[0].step
+
+        datasets.push({
+          label: (currentStep === "H" ? "Heat" :
+              TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
+          data: [],
+          borderWidth: 2,
+          borderColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
+          backgroundColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
+          cubicInterpolationMode: "monotone",
+          pointRadius: 0
+        })
+
+        for (const entry of this.chartData) {
+          datasets[-1].data?.push(entry.temp)
+
+          if (entry.step !== currentStep) {
+            currentStep = entry.step
+
+            const ds: Chart.ChartDataSets = {
+              label: (currentStep === "H" ? "Heat" :
+                  TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
+              data: [entry.temp],
+              borderWidth: 2,
+              borderColor: (currentStep !== 'H' ? "#166a8f" : "#e15858"),
+              backgroundColor: (currentStep !== 'H' ? "#166a8f" : "#e15858"),
+              cubicInterpolationMode: "monotone",
+              pointRadius: 0
+            }
+            datasets.push(ds)
+          }
+        }
+      }
+
+      this.chart.data.datasets = datasets
       this.chart.update("none")
     }
   }
