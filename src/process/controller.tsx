@@ -120,6 +120,8 @@ export class ProcessController {
         datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
 
         if (entry.step !== currentStep) {
+          console.log(datasets[datasets.length - 1])
+
           currentStep = entry.step
 
           datasets.push(currentStep === 'H' ? this.heatDataset() :
