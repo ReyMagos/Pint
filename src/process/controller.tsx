@@ -39,11 +39,14 @@ export class ProcessController {
         .then(history => {
           for (let line of history.split("\n")) {
             const data = line.split(" ")
-            this.chartData.push({
-              time: parseInt(data[0]),
-              step: data[1],
-              temp: parseFloat(data[2])
-            })
+
+            if (data.length === 3) {
+              this.chartData.push({
+                time: parseInt(data[0]),
+                step: data[1],
+                temp: parseFloat(data[2])
+              })
+            }
           }
           this.updateChart()
         })
@@ -112,6 +115,7 @@ export class ProcessController {
       )
 
       for (const entry of this.chartData) {
+        console.log("create chart: ", entry.step, entry.time, entry.temp)
         datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
 
         if (entry.step !== currentStep) {
