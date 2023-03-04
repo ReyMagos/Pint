@@ -87,7 +87,7 @@ export class ProcessController {
       })
 
       for (const entry of this.chartData) {
-        datasets[-1].data?.push(entry.temp)
+        datasets[datasets.length - 1].data?.push(entry.temp)
 
         if (entry.step !== currentStep) {
           currentStep = entry.step
@@ -147,7 +147,7 @@ export class ProcessController {
         })
 
         for (const entry of this.chartData) {
-          datasets[-1].data?.push(entry.temp)
+          datasets[datasets.length - 1].data?.push(entry.temp)
 
           if (entry.step !== currentStep) {
             currentStep = entry.step
