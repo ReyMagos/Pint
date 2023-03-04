@@ -70,8 +70,8 @@ export class ProcessController {
   }
 
     static COLORS = [
-      "#4dc9f6", "#f67019", "#e15858",
-      "#537bc4", "#cfe84c", "#166a8f",
+      "#4dc9f6", "#f67019", "#53bb90",
+      "#296873", "#cfe84c", "#166a8f",
       "#00a950", "#f6be74", "#8549ba"
     ];
 
@@ -124,7 +124,6 @@ export class ProcessController {
         }
       }
     }
-
 
     // fixme: new chart every page creation
     this.chart = new Chart(context, {
@@ -183,6 +182,16 @@ export class ProcessController {
 
     this.currentTemplate = id
     this.setState(ProcessState.SET)
+    this.chartData = []
+
+    let totalTime = 0;
+    for (const [i, step] of TemplatesProvider.getTemplate(id).steps.entries()) {
+      this.chartData.push({ step: i.toString(), time: totalTime, temp: step.temp})
+      totalTime += step.time
+      this.chartData.push({ step: i.toString(), time: totalTime, temp: step.temp })
+    }
+
+    this.updateChart()
   }
 
   static runTemplate() {
