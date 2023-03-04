@@ -69,22 +69,38 @@ export class ProcessController {
       })
   }
 
+  static heatDataset(): Chart.ChartDataSets {
+    return {
+      label: "Heat",
+      data: [],
+      borderWidth: 2,
+      borderColor: "#e15858",
+      backgroundColor: "#e15858",
+      cubicInterpolationMode: "monotone",
+      pointRadius: 0
+    }
+  }
+
+  static plateauDataset(name: string): Chart.ChartDataSets {
+    return {
+      label: name,
+      data: [],
+      borderWidth: 2,
+      borderColor: "#166a8f",
+      backgroundColor: "#166a8f",
+      cubicInterpolationMode: "monotone",
+      pointRadius: 0
+    }
+  }
+
   static createChart(context: CanvasRenderingContext2D) {
     const datasets: any = []
 
     if (this.chartData.length > 0) {
       let currentStep = this.chartData[0].step
 
-      datasets.push({
-        label: (currentStep === "H" ? "Heat" :
-          TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
-        data: [],
-        borderWidth: 2,
-        borderColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
-        backgroundColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
-        cubicInterpolationMode: "monotone",
-        pointRadius: 0
-      })
+      datasets.push(currentStep === 'H' ? this.heatDataset() :
+        this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header))
 
       for (const entry of this.chartData) {
         datasets[datasets.length - 1].data?.push(entry.temp)
@@ -92,17 +108,8 @@ export class ProcessController {
         if (entry.step !== currentStep) {
           currentStep = entry.step
 
-          const ds: Chart.ChartDataSets = {
-            label: (currentStep === "H" ? "Heat" :
-              TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
-            data: [entry.temp],
-            borderWidth: 2,
-            borderColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
-            backgroundColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
-            cubicInterpolationMode: "monotone",
-            pointRadius: 0
-          }
-          datasets.push(ds)
+          datasets.push(currentStep === 'H' ? this.heatDataset() :
+            this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header))
         }
       }
     }
@@ -135,16 +142,8 @@ export class ProcessController {
       if (this.chartData.length > 0) {
         let currentStep = this.chartData[0].step
 
-        datasets.push({
-          label: (currentStep === "H" ? "Heat" :
-              TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
-          data: [],
-          borderWidth: 2,
-          borderColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
-          backgroundColor: (currentStep === 'H' ? "#166a8f" : "#e15858"),
-          cubicInterpolationMode: "monotone",
-          pointRadius: 0
-        })
+        datasets.push(currentStep === 'H' ? this.heatDataset() :
+          this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header))
 
         for (const entry of this.chartData) {
           datasets[datasets.length - 1].data?.push(entry.temp)
@@ -152,21 +151,13 @@ export class ProcessController {
           if (entry.step !== currentStep) {
             currentStep = entry.step
 
-            const ds: Chart.ChartDataSets = {
-              label: (currentStep === "H" ? "Heat" :
-                  TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header),
-              data: [entry.temp],
-              borderWidth: 2,
-              borderColor: (currentStep !== 'H' ? "#166a8f" : "#e15858"),
-              backgroundColor: (currentStep !== 'H' ? "#166a8f" : "#e15858"),
-              cubicInterpolationMode: "monotone",
-              pointRadius: 0
-            }
-            datasets.push(ds)
+            datasets.push(currentStep === 'H' ? this.heatDataset() :
+              this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header))
           }
         }
       }
 
+      this.chart.data.labels = this.chartData.map(entry => entry.time / 60)
       this.chart.data.datasets = datasets
       this.chart.update("none")
     }
@@ -185,7 +176,6 @@ export class ProcessController {
       .then(this.startUpdating)
       .catch(error => console.log("Run template error: ", error))
 
-    console.log(this)
     this.setState(ProcessState.RUNNING)
     this.chartData = []
   }
