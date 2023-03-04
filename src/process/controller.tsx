@@ -127,7 +127,7 @@ export class ProcessController {
 
     // fixme: new chart every page creation
     this.chart = new Chart(context, {
-      type: "line",
+      type: "scatter",
       data: {
         datasets: datasets
       },
@@ -135,7 +135,8 @@ export class ProcessController {
         scales: {
           x: {title: {display: true, text: "Time"}},
           y: {title: {display: true, text: "Temp"}}
-        }
+        },
+        showLine: true
       }
     });
   }
