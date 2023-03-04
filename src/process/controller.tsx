@@ -86,7 +86,6 @@ export class ProcessController {
       borderColor: "#e15858",
       backgroundColor: "#e15858",
       borderDash: [6, 6],
-      cubicInterpolationMode: "monotone",
       pointRadius: 0
     }
   }
@@ -98,7 +97,6 @@ export class ProcessController {
       borderWidth: 2,
       borderColor: color,
       backgroundColor: color,
-      cubicInterpolationMode: "monotone",
       pointRadius: 0
     }
   }
