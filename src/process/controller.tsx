@@ -87,7 +87,7 @@ export class ProcessController {
       backgroundColor: "#e15858",
       borderDash: [6, 6],
       cubicInterpolationMode: "monotone",
-      pointRadius: 0
+      // pointRadius: 0
     }
   }
 
@@ -99,7 +99,7 @@ export class ProcessController {
       borderColor: color,
       backgroundColor: color,
       cubicInterpolationMode: "monotone",
-      pointRadius: 0
+      // pointRadius: 0
     }
   }
 
@@ -128,6 +128,8 @@ export class ProcessController {
         }
       }
     }
+
+    console.log("create chart: ", datasets)
 
     // fixme: new chart every page creation
     this.chart = new Chart(context, {
