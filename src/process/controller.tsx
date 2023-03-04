@@ -69,6 +69,12 @@ export class ProcessController {
       })
   }
 
+    static COLORS = [
+      "#4dc9f6", "#f67019", "#e15858",
+      "#537bc4", "#cfe84c", "#166a8f",
+      "#00a950", "#f6be74", "#8549ba"
+    ];
+
   static heatDataset(): Chart.ChartDataSets {
     return {
       label: "Heat",
@@ -76,18 +82,19 @@ export class ProcessController {
       borderWidth: 2,
       borderColor: "#e15858",
       backgroundColor: "#e15858",
+      borderDash: [6, 6],
       cubicInterpolationMode: "monotone",
       pointRadius: 0
     }
   }
 
-  static plateauDataset(name: string): Chart.ChartDataSets {
+  static plateauDataset(name: string, color: string): Chart.ChartDataSets {
     return {
       label: name,
       data: [],
       borderWidth: 2,
-      borderColor: "#166a8f",
-      backgroundColor: "#166a8f",
+      borderColor: color,
+      backgroundColor: color,
       cubicInterpolationMode: "monotone",
       pointRadius: 0
     }
@@ -100,25 +107,29 @@ export class ProcessController {
       let currentStep = this.chartData[0].step
 
       datasets.push(currentStep === 'H' ? this.heatDataset() :
-        this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header))
+        this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header,
+        this.COLORS[datasets.length % 9])
+      )
 
       for (const entry of this.chartData) {
-        datasets[datasets.length - 1].data?.push(entry.temp)
+        datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
 
         if (entry.step !== currentStep) {
           currentStep = entry.step
 
           datasets.push(currentStep === 'H' ? this.heatDataset() :
-            this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header))
+            this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header,
+            this.COLORS[datasets.length % 9])
+          )
         }
       }
     }
+
 
     // fixme: new chart every page creation
     this.chart = new Chart(context, {
       type: "line",
       data: {
-        labels: this.chartData.map(entry => (entry.time / 60).toFixed(2)),
         datasets: datasets
       },
       options: {
@@ -143,21 +154,24 @@ export class ProcessController {
         let currentStep = this.chartData[0].step
 
         datasets.push(currentStep === 'H' ? this.heatDataset() :
-          this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header))
+          this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header,
+          this.COLORS[datasets.length % 9])
+        )
 
         for (const entry of this.chartData) {
-          datasets[datasets.length - 1].data?.push(entry.temp)
+          datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
 
           if (entry.step !== currentStep) {
             currentStep = entry.step
 
             datasets.push(currentStep === 'H' ? this.heatDataset() :
-              this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header))
+              this.plateauDataset(TemplatesProvider.getTemplate(this.currentTemplate).steps[parseInt(currentStep)].header,
+              this.COLORS[datasets.length % 9])
+            )
           }
         }
       }
 
-      this.chart.data.labels = this.chartData.map(entry => (entry.time / 60).toFixed(2))
       this.chart.data.datasets = datasets
       this.chart.update("none")
     }
