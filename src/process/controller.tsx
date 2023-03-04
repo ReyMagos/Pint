@@ -87,7 +87,7 @@ export class ProcessController {
       backgroundColor: "#e15858",
       borderDash: [6, 6],
       cubicInterpolationMode: "monotone",
-      // pointRadius: 0
+      pointRadius: 0
     }
   }
 
@@ -99,7 +99,7 @@ export class ProcessController {
       borderColor: color,
       backgroundColor: color,
       cubicInterpolationMode: "monotone",
-      // pointRadius: 0
+      pointRadius: 0
     }
   }
 
@@ -115,7 +115,6 @@ export class ProcessController {
       )
 
       for (const entry of this.chartData) {
-        console.log("create chart: ", entry.step, entry.time, entry.temp)
         datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
 
         if (entry.step !== currentStep) {
@@ -129,8 +128,6 @@ export class ProcessController {
       }
     }
 
-    console.log("create chart: ", datasets)
-
     // fixme: new chart every page creation
     this.chart = new Chart(context, {
       type: "scatter",
@@ -139,8 +136,8 @@ export class ProcessController {
       },
       options: {
         scales: {
-          x: {title: {display: true, text: "Time"}},
-          y: {title: {display: true, text: "Temp"}}
+          x: {title: {display: true, text: "Time"}, offset: true},
+          y: {title: {display: true, text: "Temp"}, offset: true}
         },
         showLine: true
       }
@@ -165,7 +162,6 @@ export class ProcessController {
         )
 
         for (const entry of this.chartData) {
-          console.log("update chart: ", entry.step, entry.time, entry.temp)
           datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
 
           if (entry.step !== currentStep) {
@@ -197,7 +193,6 @@ export class ProcessController {
       this.chartData.push({ step: i.toString(), time: totalTime, temp: step.temp })
       totalTime += step.time
       this.chartData.push({ step: i.toString(), time: totalTime, temp: step.temp })
-      console.log("set template: ", i, totalTime, step.temp)
     }
 
     this.updateChart()
