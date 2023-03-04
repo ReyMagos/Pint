@@ -118,7 +118,7 @@ export class ProcessController {
     this.chart = new Chart(context, {
       type: "line",
       data: {
-        labels: this.chartData.map(entry => entry.time / 60),
+        labels: this.chartData.map(entry => (entry.time / 60).toFixed(2)),
         datasets: datasets
       },
       options: {
@@ -157,7 +157,7 @@ export class ProcessController {
         }
       }
 
-      this.chart.data.labels = this.chartData.map(entry => entry.time / 60)
+      this.chart.data.labels = this.chartData.map(entry => (entry.time / 60).toFixed(2))
       this.chart.data.datasets = datasets
       this.chart.update("none")
     }
