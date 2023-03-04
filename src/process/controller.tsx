@@ -159,7 +159,7 @@ export class ProcessController {
         )
 
         for (const entry of this.chartData) {
-          console.log(entry.time, entry.temp)
+          console.log("update chart: ", entry.step, entry.time, entry.temp)
           datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
 
           if (entry.step !== currentStep) {
@@ -191,6 +191,7 @@ export class ProcessController {
       this.chartData.push({ step: i.toString(), time: totalTime, temp: step.temp })
       totalTime += step.time
       this.chartData.push({ step: i.toString(), time: totalTime, temp: step.temp })
+      console.log("set template: ", i, totalTime, step.temp)
     }
 
     this.updateChart()
