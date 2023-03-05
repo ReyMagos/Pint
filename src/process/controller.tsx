@@ -117,7 +117,7 @@ export class ProcessController {
       )
 
       for (const entry of this.chartData) {
-        datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
+        datasets[datasets.length - 1].data?.push({x: (entry.time / 60).toFixed(2), y: entry.temp})
 
         if (entry.step !== currentStep) {
           currentStep = entry.step
@@ -166,7 +166,7 @@ export class ProcessController {
         )
 
         for (const entry of this.chartData) {
-          datasets[datasets.length - 1].data?.push({x: entry.time, y: entry.temp})
+          datasets[datasets.length - 1].data?.push({x: (entry.time / 60).toFixed(2), y: entry.temp})
 
           if (entry.step !== currentStep) {
             currentStep = entry.step
